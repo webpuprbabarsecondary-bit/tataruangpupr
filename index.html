@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Digital Penataan Ruang Bangka Barat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcfaf7;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        .sidebar-link.active {
+            background-color: #134e4a;
+            color: white;
+        }
+
+        .custom-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+
+        .step-node {
+            position: relative;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background: white;
+            border: 2px solid #0d9488;
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen">
+
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+        <div class="p-6">
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center font-bold text-xl">B</div>
+                <h1 class="text-lg font-bold leading-tight">Penataan Ruang<br><span class="text-teal-400 text-sm">Bangka Barat</span></h1>
+            </div>
+            
+            <nav class="space-y-1">
+                <button onclick="showSection('dashboard')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition flex items-center active">
+                    <span class="mr-3">⊞</span> Dashboard
+                </button>
+                <button onclick="showSection('regulasi')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition flex items-center">
+                    <span class="mr-3">⚖</span> Regulasi & SOTK
+                </button>
+                <button onclick="showSection('wilayah')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition flex items-center">
+                    <span class="mr-3">📍</span> Profil Wilayah
+                </button>
+                <button onclick="showSection('rencana')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition flex items-center">
+                    <span class="mr-3">📜</span> RDTR & RTRW
+                </button>
+                <button onclick="showSection('strategis')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition flex items-center">
+                    <span class="mr-3">⚡</span> Kawasan Strategis
+                </button>
+                <button onclick="showSection('layanan')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition flex items-center">
+                    <span class="mr-3">🌐</span> Layanan KKPR
+                </button>
+                <button onclick="showSection('evaluasi')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition flex items-center">
+                    <span class="mr-3">✓</span> Evaluasi & Konflik
+                </button>
+            </nav>
+        </div>
+    </aside>
+
+    <main class="flex-1 md:ml-64 p-4 md:p-8">
+        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl custom-shadow border border-slate-100">
+            <div>
+                <p class="text-sm text-slate-500 font-medium uppercase tracking-wider">Modul Informasi Digital</p>
+                <h2 id="section-title" class="text-2xl font-bold text-slate-800">Ringkasan Spasial</h2>
+            </div>
+            <div class="hidden md:flex items-center space-x-4">
+                <div class="text-right">
+                    <p class="text-sm font-bold">DPUPR Bangka Barat</p>
+                    <p class="text-xs text-slate-400">Pemerintah Kabupaten</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold italic">B</div>
+            </div>
+            <button class="md:hidden p-2 text-slate-600" onclick="toggleMobileMenu()">☰</button>
+        </header>
+
+        <section id="dashboard" class="content-section">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="glass-card p-6 rounded-2xl border-l-4 border-teal-500">
+                    <p class="text-sm text-slate-500">Total Luas Darat</p>
+                    <h3 class="text-2xl font-bold">284.886<span class="text-sm font-normal text-slate-400"> Ha</span></h3>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border-l-4 border-blue-500">
+                    <p class="text-sm text-slate-500">Total Kecamatan</p>
+                    <h3 class="text-2xl font-bold">6 <span class="text-sm font-normal text-slate-400">Unit</span></h3>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border-l-4 border-amber-500">
+                    <p class="text-sm text-slate-500">RDTR Disahkan</p>
+                    <h3 class="text-2xl font-bold">1 <span class="text-sm font-normal text-slate-400">(Mentok)</span></h3>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border-l-4 border-purple-500">
+                    <p class="text-sm text-slate-500">Evaluasi RTRW</p>
+                    <h3 class="text-2xl font-bold">2026</h3>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl custom-shadow border border-slate-100">
+                    <h4 class="font-bold mb-4 text-slate-700">Proporsi Luas Wilayah per Kecamatan</h4>
+                    <div class="chart-container">
+                        <canvas id="luasChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl custom-shadow border border-slate-100">
+                    <h4 class="font-bold mb-2 text-slate-700 text-center">Status Dokumen Perencanaan</h4>
+                    <p class="text-xs text-slate-400 text-center mb-4">Hierarki Instrumen Tata Ruang</p>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-teal-50 rounded-lg">
+                            <span class="font-medium text-teal-800">RTRW Kabupaten</span>
+                            <span class="px-2 py-1 bg-teal-200 text-teal-800 text-xs rounded font-bold uppercase italic">Berlaku</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                            <span class="font-medium text-blue-800">RDTR Mentok</span>
+                            <span class="px-2 py-1 bg-blue-200 text-blue-800 text-xs rounded font-bold uppercase italic">Berlaku (2024)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+                            <span class="font-medium text-slate-600">RDTR Jebus</span>
+                            <span class="px-2 py-1 bg-slate-200 text-slate-600 text-xs rounded font-bold uppercase italic">Penyusunan</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+                            <span class="font-medium text-slate-600">RDTR Parittiga</span>
+                            <span class="px-2 py-1 bg-slate-200 text-slate-600 text-xs rounded font-bold uppercase italic">Validasi KLHS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="regulasi" class="content-section hidden">
+            <div class="bg-teal-900 text-white p-8 rounded-2xl mb-8">
+                <h3 class="text-xl font-bold mb-2">Landasan Hukum & Kebijakan</h3>
+                <p class="text-teal-100 leading-relaxed">Penyelenggaraan tata ruang di Bangka Barat didasarkan pada reformasi UU Cipta Kerja untuk mengintegrasikan ruang darat dan laut dalam satu kesatuan dokumen hukum.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl border border-slate-200">
+                    <h4 class="text-teal-600 font-bold mb-4 flex items-center">
+                        <span class="mr-2">📁</span> Dokumen Induk
+                    </h4>
+                    <ul class="space-y-4">
+                        <li class="border-l-2 border-teal-500 pl-4">
+                            <p class="font-bold text-sm">Perda No. 1 Tahun 2014</p>
+                            <p class="text-xs text-slate-500">RTRW Kabupaten Bangka Barat 2014-2034. Dasar RPJMD & Penataan Wilayah.</p>
+                        </li>
+                        <li class="border-l-2 border-slate-300 pl-4">
+                            <p class="font-bold text-sm">UU No. 6 Tahun 2023</p>
+                            <p class="text-xs text-slate-500">Penetapan Perppu Cipta Kerja menjadi UU. Transformasi layanan digital.</p>
+                        </li>
+                        <li class="border-l-2 border-slate-300 pl-4">
+                            <p class="font-bold text-sm">PP No. 21 Tahun 2021</p>
+                            <p class="text-xs text-slate-500">Penyelenggaraan Penataan Ruang. Perubahan Izin Lokasi menjadi KKPR.</p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200">
+                    <h4 class="text-teal-600 font-bold mb-4 flex items-center">
+                        <span class="mr-2">🏢</span> Struktur Kelembagaan
+                    </h4>
+                    <p class="text-sm text-slate-600 mb-4">DPUPR melalui Bidang Penataan Ruang menjalankan tiga fungsi utama:</p>
+                    <div class="grid grid-cols-1 gap-2">
+                        <div class="p-3 bg-slate-50 rounded border text-sm font-medium">1. Perencanaan Tata Ruang</div>
+                        <div class="p-3 bg-slate-50 rounded border text-sm font-medium">2. Pemanfaatan Ruang</div>
+                        <div class="p-3 bg-slate-50 rounded border text-sm font-medium">3. Pengendalian Pemanfaatan Ruang</div>
+                        <div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded text-xs">
+                            <strong>Forum Penataan Ruang (FPR):</strong> Memberikan pertimbangan teknis dan penyelesaian sengketa pemanfaatan ruang.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="wilayah" class="content-section hidden">
+            <p class="mb-6 text-slate-600">Analisis profil geografis mencakup karakteristik fisik 6 kecamatan dan identifikasi zona rawan bencana banjir di wilayah Bangka Barat.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl custom-shadow border border-slate-100">
+                    <h4 class="font-bold mb-4">Data Karakteristik Kecamatan</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-600">
+                                <tr>
+                                    <th class="p-3 font-semibold">Kecamatan</th>
+                                    <th class="p-3 font-semibold">Persentase</th>
+                                    <th class="p-3 font-semibold">Fokus Pengembangan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <tr>
+                                    <td class="p-3 font-medium">Mentok</td>
+                                    <td class="p-3">16,46%</td>
+                                    <td class="p-3 text-xs">Pusat Pemerintahan, KIPT, Cagar Budaya</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium">Simpang Teritip</td>
+                                    <td class="p-3">21,97%</td>
+                                    <td class="p-3 text-xs">Agribisnis, Perkebunan, Rawan Banjir</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium">Jebus</td>
+                                    <td class="p-3">11,62%</td>
+                                    <td class="p-3 text-xs">Pertambangan, Perdagangan, Perikanan</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium">Parittiga</td>
+                                    <td class="p-3">11,47%</td>
+                                    <td class="p-3 text-xs">Agrobisnis, Kawasan Perkotaan Baru</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium">Kelapa</td>
+                                    <td class="p-3">21,10%</td>
+                                    <td class="p-3 text-xs">Sentra Perkebunan, Koridor Transportasi</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium">Tempilang</td>
+                                    <td class="p-3">17,38%</td>
+                                    <td class="p-3 text-xs">Perkebunan, Perikanan, Rawan Banjir</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl custom-shadow border border-slate-100">
+                    <h4 class="font-bold mb-4 text-center">Analisis Risiko Banjir (Ha)</h4>
+                    <p class="text-xs text-slate-400 mb-6 text-center italic">Luas pemukiman di zona risiko tinggi</p>
+                    <div class="chart-container">
+                        <canvas id="banjirChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="rencana" class="content-section hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl custom-shadow">
+                    <h4 class="text-lg font-bold border-b pb-2 mb-4">RDTR Perkotaan Mentok</h4>
+                    <p class="text-sm text-slate-600 mb-4">Ditetapkan melalui <strong>Perbup No. 40 Tahun 2024</strong>. Luas delimitasi 5.603 Hektare mencakup 5 Kelurahan dan 2 Desa.</p>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="p-2 bg-slate-50 rounded">Tanjung</div>
+                        <div class="p-2 bg-slate-50 rounded">Keranggan</div>
+                        <div class="p-2 bg-slate-50 rounded">Menjelang</div>
+                        <div class="p-2 bg-slate-50 rounded">Sungaibaru</div>
+                        <div class="p-2 bg-slate-50 rounded">Sungaidaeng</div>
+                        <div class="p-2 bg-slate-50 rounded font-bold text-teal-600">Terintegrasi OSS</div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-300">
+                    <h4 class="text-lg font-bold border-b pb-2 mb-4 text-slate-500 italic">Program Strategis RDTR</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs">1</div>
+                            <div>
+                                <p class="font-bold text-sm">RDTR Jebus</p>
+                                <p class="text-xs text-slate-500">Fokus penataan pertumbuhan utara & mitigasi banjir. Melalui Program MSIB.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs">2</div>
+                            <div>
+                                <p class="font-bold text-sm">RDTR Parittiga</p>
+                                <p class="text-xs text-slate-500">Tahap validasi KLHS & Konsultasi Publik II. Pusat agrobisnis.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs">3</div>
+                            <div>
+                                <p class="font-bold text-sm">Revisi RTRW 2026</p>
+                                <p class="text-xs text-slate-500">Sinkronisasi hasil evaluasi ATR/BPN dengan dinamika daerah.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="strategis" class="content-section hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl custom-shadow">
+                    <h4 class="font-bold mb-4 text-teal-700">Kawasan Industri & Pelabuhan Terpadu (KIPT) Tanjung Ular</h4>
+                    <p class="text-sm text-slate-600 mb-6 italic">Dialokasikan seluas 588,25 Ha untuk menciptakan multiplier effect ekonomi.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 rounded-xl bg-teal-50 border border-teal-100 text-center">
+                            <p class="text-xs text-teal-600 font-bold uppercase mb-1">RDTC</p>
+                            <p class="text-lg font-bold">8,12 Ha</p>
+                            <p class="text-[10px] text-slate-400 leading-tight">Riset & Pelatihan</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-blue-50 border border-blue-100 text-center">
+                            <p class="text-xs text-blue-600 font-bold uppercase mb-1">Warehousing</p>
+                            <p class="text-lg font-bold">15,45 Ha</p>
+                            <p class="text-[10px] text-slate-400 leading-tight">Gudang & Logistik</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                            <p class="text-xs text-slate-600 font-bold uppercase mb-1">Stockpile</p>
+                            <p class="text-lg font-bold">22,08 Ha</p>
+                            <p class="text-[10px] text-slate-400 leading-tight">Bahan Baku Curah</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 p-4 bg-slate-900 text-white rounded-xl">
+                        <p class="text-xs opacity-70">Proyeksi Kebutuhan Air Minum (RISPAM):</p>
+                        <p class="text-sm font-bold mt-1 text-teal-300">+1.330 Liter/Detik (Hingga 2035)</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl custom-shadow">
+                    <h4 class="font-bold mb-4">SKW I Mentok (Wisata)</h4>
+                    <div class="space-y-2 max-h-80 overflow-y-auto pr-2">
+                        <div class="text-xs p-2 bg-amber-50 border-l-2 border-amber-400 rounded">Cagar Budaya Menumbing</div>
+                        <div class="text-xs p-2 bg-slate-50 border-l-2 border-slate-400 rounded">Pantai Tanjung Kalian</div>
+                        <div class="text-xs p-2 bg-slate-50 border-l-2 border-slate-400 rounded">Batu Balai</div>
+                        <div class="text-xs p-2 bg-slate-50 border-l-2 border-slate-400 rounded">Pantai Batu Rakit</div>
+                        <div class="text-xs p-2 bg-slate-50 border-l-2 border-slate-400 rounded">Pantai Tanjung Ular</div>
+                        <div class="text-xs p-2 bg-slate-50 border-l-2 border-slate-400 rounded">Pantai Menggris</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="layanan" class="content-section hidden">
+            <div class="max-w-4xl mx-auto">
+                <h4 class="text-xl font-bold text-center mb-8">Alur Pelayanan KKPR Digital</h4>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 relative">
+                    <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-slate-200 -ml-0.5"></div>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-teal-600 text-white p-3 text-center rounded-lg font-bold">WILAYAH BER-RDTR</div>
+                        <div class="step-node shadow-sm">
+                            <span class="text-xs font-bold text-teal-600">STEP 1</span>
+                            <p class="text-sm font-bold">Pendaftaran OSS-RBA</p>
+                            <p class="text-xs text-slate-500">Input titik koordinat & rencana kegiatan.</p>
+                        </div>
+                        <div class="step-node shadow-sm">
+                            <span class="text-xs font-bold text-teal-600">STEP 2</span>
+                            <p class="text-sm font-bold">Validasi Otomatis</p>
+                            <p class="text-xs text-slate-500">Sistem mengecek kesesuaian dengan Peta Digital RDTR Mentok.</p>
+                        </div>
+                        <div class="p-4 bg-teal-50 border border-teal-200 rounded-xl text-center">
+                            <p class="text-teal-800 font-bold">KONFIRMASI KKPR</p>
+                            <p class="text-[10px] text-teal-600">Selesai dalam 1 Hari Kerja (Setelah Bayar PNBP)</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-slate-700 text-white p-3 text-center rounded-lg font-bold uppercase">WILAYAH NON-RDTR</div>
+                        <div class="step-node shadow-sm border-slate-300">
+                            <span class="text-xs font-bold text-slate-500">STEP 1</span>
+                            <p class="text-sm font-bold">Kajian Teknis DPUPR</p>
+                            <p class="text-xs text-slate-500">Cek peta RTRW, status kawasan hutan, & tumpang tindih.</p>
+                        </div>
+                        <div class="step-node shadow-sm border-slate-300">
+                            <span class="text-xs font-bold text-slate-500">STEP 2</span>
+                            <p class="text-sm font-bold">Rapat Forum (FPR)</p>
+                            <p class="text-xs text-slate-500">Penyusunan Pertimbangan Teknis & Rekomendasi.</p>
+                        </div>
+                        <div class="p-4 bg-slate-100 border border-slate-200 rounded-xl text-center">
+                            <p class="text-slate-800 font-bold uppercase">PERSETUJUAN KKPR</p>
+                            <p class="text-[10px] text-slate-500 italic">Melalui verifikasi manual Tim Teknis</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 p-6 bg-white rounded-2xl border border-slate-200 flex flex-col md:flex-row items-center justify-between">
+                    <div>
+                        <h5 class="font-bold">Transparansi Data Spasial</h5>
+                        <p class="text-sm text-slate-500">Akses pola ruang melalui portal resmi GISTARU & WebGIS daerah.</p>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex space-x-2">
+                        <span class="px-4 py-2 bg-slate-900 text-white rounded text-xs font-bold">GISTARU ATR/BPN</span>
+                        <span class="px-4 py-2 bg-teal-600 text-white rounded text-xs font-bold">WebGIS Bangka Barat</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="evaluasi" class="content-section hidden">
+            <div class="bg-white p-8 rounded-2xl custom-shadow border border-slate-100 mb-8">
+                <h4 class="text-lg font-bold mb-4 flex items-center">
+                    <span class="p-2 bg-amber-100 rounded mr-3">⚠️</span> Resolusi Konflik Kewilayahan
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="p-5 bg-slate-50 rounded-xl">
+                        <p class="font-bold text-slate-800 mb-1">Kompleks Perkantoran Pemkab</p>
+                        <p class="text-xs text-slate-600 leading-relaxed mb-3">Terdapat indikasi tumpang tindih dengan delineasi <strong>Hutan Lindung</strong> di Mentok.</p>
+                        <div class="inline-block px-3 py-1 bg-amber-200 text-amber-800 text-[10px] font-bold rounded">SOLUSI: Usulan Pelepasan Status Hutan (APL)</div>
+                    </div>
+                    <div class="p-5 bg-slate-50 rounded-xl">
+                        <p class="font-bold text-slate-800 mb-1">Reklamasi & Tanah Timbul</p>
+                        <p class="text-xs text-slate-600 leading-relaxed mb-3">Aktivitas di sepanjang garis pantai membutuhkan legalitas peruntukan ruang darat baru.</p>
+                        <div class="inline-block px-3 py-1 bg-blue-200 text-blue-800 text-[10px] font-bold rounded">SOLUSI: Pendataan Spasial & Koordinasi FPR</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-teal-900 text-white p-8 rounded-2xl">
+                <h4 class="text-lg font-bold mb-4">Target Strategis 2026</h4>
+                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                    <div class="flex-1 p-4 bg-teal-800 rounded-lg">
+                        <p class="text-xs opacity-70 mb-1">Penilaian Perwujudan RTR</p>
+                        <p class="text-sm">Audit menyeluruh dari Ditjen Pengendalian Pemanfaatan Ruang ATR/BPN.</p>
+                    </div>
+                    <div class="flex-1 p-4 bg-teal-800 rounded-lg">
+                        <p class="text-xs opacity-70 mb-1">Integrasi Data Pajak</p>
+                        <p class="text-sm">Sinergi KKPR dengan data PBB-P2 untuk optimalisasi PAD.</p>
+                    </div>
+                    <div class="flex-1 p-4 bg-teal-800 rounded-lg">
+                        <p class="text-xs opacity-70 mb-1">Pengawasan PPNS</p>
+                        <p class="text-sm">Penegakan sanksi bagi pemanfaatan ruang tanpa KKPR.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let charts = {};
+
+        function initCharts() {
+            // Chart 1: Luas Wilayah
+            const ctxLuas = document.getElementById('luasChart').getContext('2d');
+            charts.luas = new Chart(ctxLuas, {
+                type: 'bar',
+                data: {
+                    labels: ['S. Teritip', 'Kelapa', 'Tempilang', 'Mentok', 'Jebus', 'Parittiga'],
+                    datasets: [{
+                        label: 'Luas Hektare',
+                        data: [62600, 60100, 49514, 46900, 33100, 32671],
+                        backgroundColor: ['#0d9488', '#0f766e', '#115e59', '#134e4a', '#1e293b', '#334155'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Chart 2: Risiko Banjir
+            const ctxBanjir = document.getElementById('banjirChart').getContext('2d');
+            charts.banjir = new Chart(ctxBanjir, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Jebus', 'S. Teritip', 'Tempilang'],
+                    datasets: [{
+                        data: [86.10, 78.88, 71.38],
+                        backgroundColor: ['#f43f5e', '#fb923c', '#facc15'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            const activeLink = Array.from(document.querySelectorAll('.sidebar-link'))
+                .find(l => l.getAttribute('onclick').includes(sectionId));
+            if (activeLink) activeLink.classList.add('active');
+
+            const titles = {
+                dashboard: 'Ringkasan Spasial',
+                regulasi: 'Kerangka Hukum',
+                wilayah: 'Profil & Kebencanaan',
+                rencana: 'Dokumen RDTR & RTRW',
+                strategis: 'Pusat Pertumbuhan',
+                layanan: 'Layanan KKPR Digital',
+                evaluasi: 'Evaluasi & Strategi'
+            };
+            document.getElementById('section-title').innerText = titles[sectionId];
+            
+            if (window.innerWidth < 768) toggleMobileMenu();
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        window.onload = initCharts;
+    </script>
+</body>
+</html>
